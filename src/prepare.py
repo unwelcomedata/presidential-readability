@@ -166,3 +166,76 @@ def value_counts_all(df: pd.DataFrame, top_n: int = 10) -> None:
 def numeric_summary(df: pd.DataFrame) -> pd.DataFrame:
     """Return describe() output for numeric columns only, transposed for readability."""
     return df.select_dtypes("number").describe().T.round(2)
+
+
+# ---------------------------------------------------------------------------
+# Readability scoring (this project's core measurement)
+# ---------------------------------------------------------------------------
+#
+# Readability is COMPUTED here (not sourced), so the formula choice is a
+# methodology decision documented in SOURCES.md. We use the `textstat` library
+# (pinned in requirements.txt) which implements the standard formulas. The lead
+# metric is Flesch-Kincaid Grade Level; companion metrics guard against any one
+# formula's quirks. Syllable counting (the fuzzy step) is textstat/pyphen's.
+#
+# CAVEAT (carry into charts/codebook): readability formulas were built for
+# WRITTEN prose. Applying them to transcribed SPOKEN speech is a consistent
+# index, not a literal measure of how hard a speech sounded. Segment any trend
+# at the written->spoken (~1913) delivery break.
+
+# Metric name -> textstat function name. Kept explicit so the codebook can state
+# exactly what each column is and which formula produced it.
+READABILITY_METRICS = {
+    "fk_grade": "flesch_kincaid_grade",        # LEAD: U.S. school grade level
+    "flesch_reading_ease": "flesch_reading_ease",  # 0-100, higher = easier
+    "smog_index": "smog_index",                # grade level (SMOG)
+    "gunning_fog": "gunning_fog",              # grade level (Gunning Fog)
+    "coleman_liau": "coleman_liau_index",      # grade level (Coleman-Liau)
+}
+
+
+def score_readability(text: str) -> dict[str, float]:
+    """Compute the readability metrics for one text via textstat.
+
+    Returns a dict keyed by READABILITY_METRICS names. Empty/whitespace text
+    yields all-None (can't score). Any per-metric failure yields None for that
+    metric rather than aborting the row.
+    """
+    import textstat
+
+    if not isinstance(text, str) or not text.strip():
+        return {k: None for k in READABILITY_METRICS}
+
+    out: dict[str, float] = {}
+    for name, fn_name in READABILITY_METRICS.items():
+        try:
+            out[name] = round(float(getattr(textstat, fn_name)(text)), 2)
+        except Exception:
+            out[name] = None
+    return out
+
+
+def add_readability(df: pd.DataFrame, text_col: str = "transcript") -> pd.DataFrame:
+    """Add one readability column per READABILITY_METRICS entry, plus counts.
+
+    Adds: fk_grade, flesch_reading_ease, smog_index, gunning_fog, coleman_liau,
+    and word_count / sentence_count (via textstat, so the codebook can report the
+    inputs behind the grade). Deterministic given the text + textstat version.
+    """
+    import textstat
+
+    out = df.copy()
+    scores = out[text_col].fillna("").map(score_readability).apply(pd.Series)
+    for col in READABILITY_METRICS:
+        out[col] = pd.to_numeric(scores[col], errors="coerce").astype("Float64")
+
+    # Report the raw inputs behind the grade (transparency for the codebook).
+    def _wc(t):
+        return textstat.lexicon_count(t, removepunct=True) if isinstance(t, str) and t.strip() else pd.NA
+
+    def _sc(t):
+        return textstat.sentence_count(t) if isinstance(t, str) and t.strip() else pd.NA
+
+    out["word_count"] = out[text_col].map(_wc).astype("Int64")
+    out["sentence_count"] = out[text_col].map(_sc).astype("Int64")
+    return out
