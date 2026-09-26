@@ -106,7 +106,22 @@ methodology decision a skeptic will scrutinize — document it fully here and in
     different sentence structure — treat scores as a consistent *index*, not literal grade.
   - The written→spoken era break (above) dominates any raw 1789→present trend; segment it.
   - Sentence segmentation on historical transcripts is imperfect (punctuation conventions
-    changed) and directly affects words/sentence — document the segmenter used.
+    changed) and directly affects words/sentence — sentences are counted with **NLTK punkt**,
+    not textstat's naive splitter.
+  - **HTML line-break tags in transcripts (fixed 2026-09-26).** Some Miller Center transcripts
+    use `<br />` tags in place of sentence punctuation between paragraphs. Left in, they merge
+    text into 250-word "sentences" and inflate the grade (the Nixon 1970–72 SOTUs read as
+    grade ~26 instead of ~11). `02-clean` now converts block-level HTML tags to sentence
+    boundaries before scoring, so words-per-sentence reflects real sentences.
+  - **Absolute levels are tokenizer- and source-dependent.** Independent readability series that
+    use the UCSB/American Presidency Project transcripts (rather than the Miller Center corpus)
+    typically sit **2–5 grade points lower** in absolute terms, especially pre-1980, because of
+    differences in sentence-boundary detection and syllable counting. The **long-term decline
+    replicates across all of them** — treat the grade values as a consistent *index*, not a
+    literal grade, and state this in any published caption. (Cross-checked against Smart
+    Politics / U. Minnesota, Berkeley datascience@berkeley, Guardian, Priceonomics, and the
+    stateoftheunion.onetwothree.net full-corpus visualization — independent validation
+    2026-09-26, verdict "Pass with notes".)
 
 ---
 

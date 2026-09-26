@@ -103,8 +103,8 @@ def main() -> int:
         "GROUP BY 1 ORDER BY 1").df()
     check("chart02: 12 decade bins (1910s..2020s)",
           len(dec) == 12, f"got {len(dec)}")
-    check("chart02: 1910s decade @ grade 15.8",
-          int(dec.iloc[0].decade) == 1910 and dec.iloc[0].fk == 15.8,
+    check("chart02: 1910s decade @ grade 15.5",
+          int(dec.iloc[0].decade) == 1910 and dec.iloc[0].fk == 15.5,
           f"got {int(dec.iloc[0].decade)} @ {dec.iloc[0].fk}")
     check("chart02: 2020s decade @ grade 7.8",
           int(dec.iloc[-1].decade) == 2020 and dec.iloc[-1].fk == 7.8,

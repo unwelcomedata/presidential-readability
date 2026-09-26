@@ -138,11 +138,24 @@ single space. We keep the transcript column — it's the readability input for `
     code(
         """
 _ws = re.compile(r"\\s+")
+# Block-level HTML tags mark paragraph/line breaks in the Miller Center transcripts.
+# They must become a SENTENCE BOUNDARY, not vanish — otherwise punkt merges the
+# text on either side into one giant run-on "sentence" and inflates readability
+# grades (the Nixon 1970-72 SOTU spike the Grok report flagged; <br/> was standing
+# in for sentence punctuation). Convert block tags -> ". "; strip any other tags.
+_BLOCK_TAG = re.compile(r"(?i)<\\s*(br|/p|/div|/li|/h[1-6])\\s*/?\\s*>")
+_ANY_TAG = re.compile(r"<[^>]+>")
 
 def clean_text(t):
     if not isinstance(t, str) or not t:
         return ""
-    return _ws.sub(" ", html.unescape(t).replace("\\u2019", "'")).strip()
+    t = html.unescape(t).replace("\\u2019", "'")
+    t = _BLOCK_TAG.sub(". ", t)      # paragraph/line breaks -> sentence boundary
+    t = _ANY_TAG.sub(" ", t)          # drop any remaining inline tags
+    t = _ws.sub(" ", t)
+    # collapse the ". ." runs that back-to-back block tags create
+    t = re.sub(r"(\\.\\s*){2,}", ". ", t)
+    return t.strip()
 
 raw["transcript"] = raw["transcript"].map(clean_text)
 raw["president"] = raw["president"].astype("string").str.strip()
