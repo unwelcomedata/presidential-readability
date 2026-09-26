@@ -299,3 +299,82 @@ def save_processed(df: pd.DataFrame, cfg: dict[str, Any], filename: str) -> Path
     df.to_parquet(out, index=False, engine=cfg["settings"]["parquet_engine"])
     print(f"Saved processed → {out}  ({len(df):,} rows)")
     return out
+
+
+# ---------------------------------------------------------------------------
+# Speech classification (structural — from title + date). Cleaning-stage
+# derivations; readability scoring lives in src/prepare.py (03-prepare).
+# ---------------------------------------------------------------------------
+
+# Year at/after which the annual message was DELIVERED as spoken oratory. Wilson
+# revived in-person delivery in 1913; before that (Jefferson 1801 → Taft 1912)
+# the annual message was a WRITTEN document read by a clerk. This is the load-
+# bearing series break for any 1789->present readability trend.
+SPOKEN_ERA_START_YEAR = 1913
+
+
+def _title_label(title: str) -> str:
+    """Return the descriptive part of a Miller Center title (after the colon)."""
+    return title.split(":", 1)[1].strip() if ":" in title else (title or "").strip()
+
+
+def classify_speech_type(title: str) -> str:
+    """Bucket a speech into an institutional type from its title.
+
+    Buckets: 'Inaugural Address', 'State of the Union', 'Annual Message',
+    'Farewell Address', 'Press/News Conference', 'Address to Congress',
+    'Nomination Acceptance', 'Debate', 'Fireside Chat', 'Oath of Office',
+    'Other'. 'State of the Union' and 'Annual Message' are the SAME
+    constitutional address under different era-labels — unify them with
+    ``sotu_series()`` for the broad-coverage SOTU comparison.
+    """
+    l = _title_label(title).lower()
+    if "inaugural address" in l:
+        return "Inaugural Address"
+    if "state of the union" in l:
+        return "State of the Union"
+    if "annual message" in l:
+        return "Annual Message"
+    if "farewell" in l:
+        return "Farewell Address"
+    if "press conference" in l or "news conference" in l:
+        return "Press/News Conference"
+    if "fireside" in l:
+        return "Fireside Chat"
+    if "debate" in l:
+        return "Debate"
+    if "acceptance" in l and ("nomination" in l or "convention" in l):
+        return "Nomination Acceptance"
+    if "oath" in l:
+        return "Oath of Office"
+    if "to congress" in l or "joint session" in l:
+        return "Address to Congress"
+    return "Other"
+
+
+def sotu_series(speech_type: str) -> bool:
+    """True if a speech is part of the unified State-of-the-Union series.
+
+    The Article II annual address to Congress was labeled 'Annual Message'
+    through 1928 and 'State of the Union' from 1929 on — same institutional
+    speech, unified here for cross-president comparison.
+    """
+    return speech_type in ("State of the Union", "Annual Message")
+
+
+def delivery_mode(year: int | None) -> str:
+    """Classify a speech as 'written' (pre-1913) or 'spoken' (1913+) era.
+
+    This is the era of PRESIDENTIAL ADDRESS DELIVERY, not a per-speech fact: the
+    annual message was a written document read by a clerk from 1801 to 1912, and
+    delivered orally from 1913 on. Readability trends must respect this break —
+    written documents are systematically longer and more complex than delivered
+    oratory. Returns 'unknown' if the year is missing.
+    """
+    if year is None:
+        return "unknown"
+    try:
+        y = int(year)
+    except (TypeError, ValueError):
+        return "unknown"
+    return "spoken" if y >= SPOKEN_ERA_START_YEAR else "written"
