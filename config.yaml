@@ -15,17 +15,27 @@ settings:
   duckdb_file: data/project.duckdb   # single file DB for the project
 
 sources:
-  # Define each data source here before ingesting.
-  # url:        full URL to fetch
-  # type:       html_table | html_scrape | csv | json
-  # table_index: (html_table only) zero-based index of the target <table>
-  # js_render:  true if the page requires Playwright (JS-rendered)
-  # Example:
-  # fatalities:
-  #   url: https://example.gov/data/fatalities
-  #   type: html_table
-  #   table_index: 0
+  # PRIMARY SOURCE — same corpus as the shipped `presidential-speeches` project,
+  # re-used here to answer a DIFFERENT question: how the READABILITY (reading-grade
+  # level) of presidential speeches has changed 1789 -> present.
+  #
+  # Miller Center (UVA) curated presidential speech corpus — a single bulk tgz that
+  # expands to speeches/*.json (one speech per file: transcript + title/date/president).
+  # Public domain; Miller Center deprecated its API in favor of this bulk download.
+  # 01-ingest fetches + unpacks the tgz directly (see src/ingest.py::ingest_miller_center).
+  miller_center_speeches:
+    url: https://data.millercenter.org/miller_center_speeches.tgz
+    type: archive_tgz          # download + extract; parse speeches/*.json
+    js_render: false
+    rate_limit_seconds: 2.0
+
+  # LATER EXPANSION (not first ingest) — The American Presidency Project (UCSB),
+  # the fuller ~130k-document corpus. Add when broadening past the Miller Center set.
+  # american_presidency_project:
+  #   url: https://www.presidency.ucsb.edu/documents
+  #   type: html_scrape
   #   js_render: false
+  #   rate_limit_seconds: 2.0
 
 export:
   formats:

@@ -1,5 +1,16 @@
 # presidential-readability
 
+**Have presidential speeches gotten simpler over time?** This project measures the
+**reading-grade level** (Flesch–Kincaid and related readability formulas) of U.S.
+presidential speeches from 1789 to the present, using the same Miller Center corpus as
+the published [`presidential-speeches`](https://github.com/unwelcomedata/presidential-speeches)
+project — re-used here to answer a different question.
+
+The lead chart is a single time-series line: average reading-grade level of presidential
+speeches by year/decade, with the written-era → spoken-era break (pre-radio messages to
+Congress were written documents, not delivered oratory) marked so the two eras aren't
+read as one continuous trend.
+
 > **AI-Assisted Development**
 > This project was built with the assistance of [Kiro](https://kiro.dev),
 > an AI-powered development environment. All data sourcing decisions,

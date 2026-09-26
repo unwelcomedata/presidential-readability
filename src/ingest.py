@@ -251,6 +251,90 @@ def download_file(url: str, dest: Path, headers: dict | None = None, timeout: in
 
 
 # ---------------------------------------------------------------------------
+# Miller Center presidential speech archive (bulk tgz → speeches/*.json)
+# ---------------------------------------------------------------------------
+
+def ingest_miller_center(
+    cfg: dict,
+    source_name: str = "miller_center_speeches",
+    max_age_hours: float = 24.0,
+) -> pd.DataFrame:
+    """Download + unpack the Miller Center speech archive and return a DataFrame.
+
+    The University of Virginia Miller Center offers its curated presidential
+    speech corpus as a single gzipped tar archive (its API is deprecated). The
+    archive expands to a ``speeches/`` directory of JSON files, one speech per
+    file, each carrying: title, doc_name, url, date, transcript,
+    transcript_html, president, introduction.
+
+    Same corpus as the sibling ``presidential-speeches`` project; re-used here
+    for the readability question. This helper:
+      1. Downloads the tgz to ``data/raw/{source_name}.tgz`` (cached — skipped if
+         a copy younger than ``max_age_hours`` already exists).
+      2. Extracts ``speeches/*.json`` into ``data/raw/speeches/`` verbatim
+         (raw files are never modified downstream).
+      3. Reads every JSON into a tidy DataFrame (one row per speech).
+
+    The returned frame is unmodified source content (plus a ``source_file``
+    provenance column); all cleaning/derivation happens in 02-clean.
+
+    Args:
+        cfg:           Loaded config dict (from load_config()).
+        source_name:   Key under ``sources:`` in config.yaml.
+        max_age_hours: Re-download the tgz only if the cache is older than this.
+
+    Returns:
+        DataFrame with columns: title, doc_name, url, date, transcript,
+        transcript_html, president, introduction, source_file.
+    """
+    import tarfile
+
+    source = cfg["sources"][source_name]
+    url: str = source["url"]
+
+    raw_dir = Path(cfg["paths"]["data_raw"])
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    tgz_path = raw_dir / f"{source_name}.tgz"
+
+    # 1. Download (cached) with a polite delay.
+    fresh = (
+        tgz_path.exists()
+        and max_age_hours > 0
+        and (time.time() - tgz_path.stat().st_mtime) / 3600 < max_age_hours
+    )
+    if not fresh:
+        time.sleep(source.get("rate_limit_seconds", 1.5))
+        print(f"→ Downloading Miller Center archive → {tgz_path}")
+        download_file(url, tgz_path)
+    else:
+        print(f"→ Using cached archive → {tgz_path}")
+
+    # 2. Extract speeches/*.json verbatim into data/raw/speeches/.
+    #    Guard against path traversal from archive member names.
+    speeches_dir = raw_dir / "speeches"
+    with tarfile.open(tgz_path, "r:gz") as tf:
+        json_members = [m for m in tf.getmembers() if m.name.endswith(".json")]
+        for m in json_members:
+            member_path = (raw_dir / m.name).resolve()
+            if not str(member_path).startswith(str(raw_dir.resolve())):
+                raise ValueError(f"Unsafe path in archive: {m.name}")
+        tf.extractall(raw_dir, members=json_members)
+    print(f"→ Extracted {len(json_members):,} speech JSON files → {speeches_dir}")
+
+    # 3. Read every JSON into a DataFrame (one row per speech).
+    records: list[dict[str, Any]] = []
+    for jf in sorted(speeches_dir.glob("*.json")):
+        with open(jf, encoding=cfg["settings"]["encoding"]) as f:
+            d = json.load(f)
+        d["source_file"] = jf.name
+        records.append(d)
+
+    df = pd.DataFrame.from_records(records)
+    print(f"→ Loaded {len(df):,} speeches, {df['president'].nunique()} presidents")
+    return df
+
+
+# ---------------------------------------------------------------------------
 # Source-driven ingest (reads config.yaml sources block)
 # ---------------------------------------------------------------------------
 
