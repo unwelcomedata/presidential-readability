@@ -183,44 +183,76 @@ def numeric_summary(df: pd.DataFrame) -> pd.DataFrame:
 # index, not a literal measure of how hard a speech sounded. Segment any trend
 # at the written->spoken (~1913) delivery break.
 
-# Metric name -> textstat function name. Kept explicit so the codebook can state
-# exactly what each column is and which formula produced it.
-READABILITY_METRICS = {
-    "fk_grade": "flesch_kincaid_grade",        # LEAD: U.S. school grade level
-    "flesch_reading_ease": "flesch_reading_ease",  # 0-100, higher = easier
-    "smog_index": "smog_index",                # grade level (SMOG)
-    "gunning_fog": "gunning_fog",              # grade level (Gunning Fog)
-    "coleman_liau": "coleman_liau_index",      # grade level (Coleman-Liau)
-}
+# SENTENCE SEGMENTATION: we count sentences with NLTK's punkt tokenizer, NOT
+# textstat's naive splitter. Sentence count is the denominator of words/sentence
+# in every grade formula, so a bad splitter inflates grades on historical
+# transcripts. (Investigation 2026-09-26 showed the naive splitter — and the raw
+# corpus — produced grade-150 "speeches" that were actually one-sentence legal
+# proclamations; punkt + a speech-type filter is the fix.) Syllable and word
+# counts still come from textstat/pyphen.
+
+READABILITY_METRICS = ("fk_grade", "flesch_reading_ease", "smog_index",
+                       "gunning_fog", "coleman_liau")
+
+
+def _punkt_sentence_count(text: str) -> int:
+    """Sentence count via NLTK punkt (downloaded in the notebook/reproduce step)."""
+    from nltk.tokenize import sent_tokenize
+    return max(len(sent_tokenize(text)), 1)
 
 
 def score_readability(text: str) -> dict[str, float]:
-    """Compute the readability metrics for one text via textstat.
+    """Compute readability metrics using punkt sentence counts + textstat parts.
 
-    Returns a dict keyed by READABILITY_METRICS names. Empty/whitespace text
-    yields all-None (can't score). Any per-metric failure yields None for that
-    metric rather than aborting the row.
+    Grade formulas are recomputed from their components so the SENTENCE count is
+    punkt's, not textstat's naive splitter:
+      - fk_grade            = 0.39*(W/S) + 11.8*(Syl/W) - 15.59
+      - flesch_reading_ease = 206.835 - 1.015*(W/S) - 84.6*(Syl/W)
+      - gunning_fog         = 0.4*((W/S) + 100*(complex/W))
+      - smog_index          = 1.043*sqrt(polysyll * 30/S) + 3.1291
+      - coleman_liau        = 0.0588*(letters/W*100) - 0.296*(S/W*100) - 15.8
+    W=words, S=sentences (punkt), Syl=syllables, complex/polysyll=>=3-syllable words.
+    Empty text -> all None.
     """
+    import math
     import textstat
 
     if not isinstance(text, str) or not text.strip():
         return {k: None for k in READABILITY_METRICS}
 
-    out: dict[str, float] = {}
-    for name, fn_name in READABILITY_METRICS.items():
-        try:
-            out[name] = round(float(getattr(textstat, fn_name)(text)), 2)
-        except Exception:
-            out[name] = None
-    return out
+    try:
+        W = max(textstat.lexicon_count(text, removepunct=True), 1)
+        S = _punkt_sentence_count(text)
+        Syl = textstat.syllable_count(text)
+        poly = textstat.polysyllabcount(text)
+        letters = textstat.letter_count(text, ignore_spaces=True)
+
+        wps = W / S
+        spw = Syl / W
+
+        fk = 0.39 * wps + 11.8 * spw - 15.59
+        ease = 206.835 - 1.015 * wps - 84.6 * spw
+        fog = 0.4 * (wps + 100.0 * (poly / W))
+        smog = 1.043 * math.sqrt(poly * (30.0 / S)) + 3.1291
+        cli = 0.0588 * (letters / W * 100.0) - 0.296 * (S / W * 100.0) - 15.8
+
+        return {
+            "fk_grade": round(fk, 2),
+            "flesch_reading_ease": round(ease, 2),
+            "smog_index": round(smog, 2),
+            "gunning_fog": round(fog, 2),
+            "coleman_liau": round(cli, 2),
+        }
+    except Exception:
+        return {k: None for k in READABILITY_METRICS}
 
 
 def add_readability(df: pd.DataFrame, text_col: str = "transcript") -> pd.DataFrame:
     """Add one readability column per READABILITY_METRICS entry, plus counts.
 
-    Adds: fk_grade, flesch_reading_ease, smog_index, gunning_fog, coleman_liau,
-    and word_count / sentence_count (via textstat, so the codebook can report the
-    inputs behind the grade). Deterministic given the text + textstat version.
+    Adds fk_grade (LEAD), flesch_reading_ease, smog_index, gunning_fog,
+    coleman_liau, and word_count / sentence_count (punkt) — the inputs behind the
+    grade, for the codebook. Deterministic given text + textstat + punkt.
     """
     import textstat
 
@@ -229,12 +261,11 @@ def add_readability(df: pd.DataFrame, text_col: str = "transcript") -> pd.DataFr
     for col in READABILITY_METRICS:
         out[col] = pd.to_numeric(scores[col], errors="coerce").astype("Float64")
 
-    # Report the raw inputs behind the grade (transparency for the codebook).
     def _wc(t):
         return textstat.lexicon_count(t, removepunct=True) if isinstance(t, str) and t.strip() else pd.NA
 
     def _sc(t):
-        return textstat.sentence_count(t) if isinstance(t, str) and t.strip() else pd.NA
+        return _punkt_sentence_count(t) if isinstance(t, str) and t.strip() else pd.NA
 
     out["word_count"] = out[text_col].map(_wc).astype("Int64")
     out["sentence_count"] = out[text_col].map(_sc).astype("Int64")

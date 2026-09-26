@@ -37,19 +37,25 @@ cells = [
 the analysis-ready `speeches_readability` table, and package the public export.
 
 **Readability is computed here, not sourced** (see `SOURCES.md` → readability methodology).
-We use the **`textstat`** library (pinned `textstat==0.7.13`) for the standard formulas:
+Grade formulas are computed from their components with **`textstat==0.7.13`** for word /
+syllable / letter counts, and **NLTK punkt (`nltk==3.10.3`) for sentence counts** — the
+sentence denominator is what a naive splitter gets wrong on historical transcripts. Metrics:
 - **`fk_grade`** — Flesch–Kincaid Grade Level (the **lead** metric: U.S. school grade level)
 - `flesch_reading_ease` — 0–100, higher = easier
 - `smog_index`, `gunning_fog`, `coleman_liau` — companion grade-level formulas (guard against
   any single formula's quirks)
 - `word_count`, `sentence_count` — the raw inputs behind the grade (transparency)
 
-**Load-bearing caveat:** these formulas were built for *written* prose; applied to transcribed
-*spoken* speech they're a consistent index, not a literal grade — and any trend must be
-segmented at the **written → spoken (~1913)** delivery break (`delivery_mode`).
+**Two data-quality decisions (2026-09-26):**
+1. **Score only real oratory** — SOTU series + inaugurals — dropping proclamations / veto
+   messages / orders that the corpus mislabels as speeches (they score as grade-150 one-sentence
+   legal texts). See the filter step below.
+2. **The published chart uses the spoken era (1913+) only** — pre-1913 annual messages were
+   *written documents* read by a clerk, and reading formulas stay unstable on them even after
+   punkt + the oratory filter (grade-40 single-sentence inaugurals persist). The export keeps
+   both eras with a `delivery_mode` flag; the chart filters to spoken.
 
-**Export:** the analysis-ready table minus the bulky `transcript` (it's the readability input,
-not a deliverable) → CSV + Excel + Parquet + codebook.
+**Export:** the analysis-ready table minus the bulky `transcript` → CSV + Excel + Parquet + codebook.
         """
     ),
     code(
@@ -66,32 +72,65 @@ from src.ingest import load_config
 from src.clean_quality import get_connection, register_source, save_processed, get_sources
 from src.prepare import add_readability, package_dataset, READABILITY_METRICS
 
+# Ensure the NLTK punkt sentence tokenizer is available (used by the scorer for
+# reliable sentence counts — see the 2026-09-26 investigation note in prepare.py).
+import nltk
+for pkg in ("punkt", "punkt_tab"):
+    try:
+        nltk.download(pkg, quiet=True)
+    except Exception:
+        pass
+
 cfg = load_config(PROJECT_ROOT / "config.yaml")
 cfg["paths"] = {k: str(PROJECT_ROOT / v) for k, v in cfg["paths"].items()}
 cfg["settings"]["duckdb_file"] = str(PROJECT_ROOT / cfg["settings"]["duckdb_file"])
 
 con = get_connection(cfg)
 clean = con.execute("SELECT * FROM speeches_clean").df()
-print("speeches_clean:", clean.shape)
+print("speeches_clean (all types):", clean.shape)
 print("metrics to compute:", list(READABILITY_METRICS))
         """
     ),
     md(
         """
-## 1. Score readability for every speech
+## 1. Filter to real oratory — SOTU series + inaugural addresses
 
-`add_readability()` (in `src/prepare.py`) maps each metric to its `textstat` function and
-adds one column per metric plus `word_count` / `sentence_count`. Deterministic given the
-text + the pinned textstat version. This is the one compute-heavy cell (~1,060 speeches).
+**Why this filter (2026-09-26 data-quality finding):** the raw corpus buckets many
+**legal/administrative documents** (proclamations, veto messages, orders, neutrality
+declarations) as generic speeches. Scored as prose, these produce absurd reading grades —
+e.g. Washington's 1795 *Proclamation of Pardons* is one 382-word grammatical sentence →
+grade ~150. They are documents, not delivered speeches, and don't belong on a
+speech-readability chart.
+
+So we score only **coherent, delivered oratory**: the **State-of-the-Union series**
+(Annual Message + State of the Union) and **Inaugural Addresses**. Both are real speeches
+with consistent form across eras, which is exactly what a readability *trend* needs.
         """
     ),
     code(
         """
-feat = add_readability(clean, text_col="transcript")
+oratory = clean[clean["is_sotu_series"] | (clean["speech_type"] == "Inaugural Address")].copy()
+print("oratory speeches:", len(oratory), "of", len(clean))
+print(oratory.groupby(["speech_type", "delivery_mode"]).size())
+        """
+    ),
+    md(
+        """
+## 2. Score readability (punkt sentence counts)
+
+`add_readability()` (in `src/prepare.py`) computes each grade formula from its components,
+counting **sentences with NLTK punkt** rather than textstat's naive splitter (the naive
+splitter is what let one-sentence proclamations reach grade 150). Adds one column per metric
+plus `word_count` / `sentence_count`. The one compute-heavy cell.
+        """
+    ),
+    code(
+        """
+feat = add_readability(oratory, text_col="transcript")
 
 score_cols = list(READABILITY_METRICS) + ["word_count", "sentence_count"]
 print("added columns:", score_cols)
-feat[["president", "year", "delivery_mode"] + score_cols].head(5)
+feat[["president", "year", "speech_type", "delivery_mode"] + score_cols].head(5)
         """
     ),
     md(
@@ -105,12 +144,17 @@ seeing it here confirms the pipeline is measuring what we think.
     ),
     code(
         """
-print("fk_grade summary:")
+print("fk_grade summary (SOTU + inaugural, punkt):")
 print(feat["fk_grade"].describe().round(2).to_string())
 print("\\nnull fk_grade:", feat["fk_grade"].isna().sum())
+print("max fk_grade:", round(feat["fk_grade"].max(), 1), "(no more grade-150 proclamation artifacts)")
 
 print("\\nmean fk_grade by delivery_mode:")
-print(feat.groupby("delivery_mode")["fk_grade"].agg(["count", "mean"]).round(2).to_string())
+print(feat.groupby("delivery_mode")["fk_grade"].agg(["count", "mean", "max"]).round(2).to_string())
+
+# The published CHART uses the spoken era only (1913+): pre-1913 messages were written
+# documents and reading formulas remain unstable on them. The EXPORT keeps both eras with
+# the delivery_mode flag so buyers have the full data + can filter as we do.
         """
     ),
     md(

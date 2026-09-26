@@ -19,7 +19,8 @@ Pillow==12.3.0               # chart rendering (Pillow-based pipeline)
 geopandas==1.0.1             # choropleth maps (optional, only if mapping)
 
 # --- readability / NLP ---
-textstat==0.7.13            # Flesch-Kincaid + companion readability formulas (this project's core metric)
+textstat==0.7.13            # Flesch-Kincaid + companion readability formula components
+nltk==3.10.3               # punkt sentence tokenizer (reliable sentence counts on historical transcripts)
 
 # --- data packaging ---
 openpyxl==3.1.5              # Excel export for sellable datasets
