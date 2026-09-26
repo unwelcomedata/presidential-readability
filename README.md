@@ -1,183 +1,99 @@
-# presidential-readability
+# Presidential Readability
 
-**Have presidential speeches gotten simpler over time?** This project measures the
-**reading-grade level** (Flesch–Kincaid and related readability formulas) of U.S.
-presidential speeches from 1789 to the present, using the same Miller Center corpus as
-the published [`presidential-speeches`](https://github.com/unwelcomedata/presidential-speeches)
-project — re-used here to answer a different question.
+**[@unwelcomedata](https://github.com/unwelcomedata)** · data from public sources
 
-The lead chart is a single time-series line: average reading-grade level of presidential
-speeches by year/decade, with the written-era → spoken-era break (pre-radio messages to
-Congress were written documents, not delivered oratory) marked so the two eras aren't
-read as one continuous trend.
+**Have presidential speeches gotten simpler over time?** Yes — markedly. This project
+measures the **reading-grade level** of U.S. presidential oratory across the
+spoken/broadcast era (1913–present) and finds a clear long-term decline: the State of the
+Union has fallen from a mid-teens/college reading level to around **8th grade** today.
+
+Reading grade is measured with **Flesch–Kincaid** (and three companion formulas as a
+cross-check). A higher number means more complex text — roughly, the U.S. school grade you'd
+need to read it comfortably.
+
+---
+
+## The State of the Union got simpler
+
+[![State-of-the-Union reading grade level, 1913–2026](docs/01_sotu_readability.png)](docs/01_sotu_readability.png)
+
+Average Flesch–Kincaid grade level of each State-of-the-Union address, **spoken/broadcast
+era (1913 on)**. The series starts in 1913 on purpose — see *How it was measured* below.
+
+## Four formulas agree
+
+[![State-of-the-Union readability by decade, four formulas](docs/02_sotu_four_formulas.png)](docs/02_sotu_four_formulas.png)
+
+Flesch–Kincaid, SMOG, Gunning Fog, and Coleman–Liau, averaged by decade. They all trend the
+same way — the decline isn't an artifact of one formula's quirks.
+
+## Inaugurals too
+
+[![Inaugural address reading grade level, 1913–2025](docs/03_inaugural_readability.png)](docs/03_inaugural_readability.png)
+
+Inaugural addresses — a different, always-spoken speech type — show the same downward drift
+(noisier, since it's one speech per term).
+
+---
+
+## How it was measured
+
+- **Source:** the University of Virginia **Miller Center** curated corpus of major
+  presidential speeches (public domain). See [SOURCES.md](SOURCES.md).
+- **Metric:** **Flesch–Kincaid Grade Level** (lead), plus SMOG, Gunning Fog, and
+  Coleman–Liau as companions. Grade formulas are computed from word/syllable counts and
+  **sentence counts from the NLTK punkt tokenizer** (a reliable sentence splitter matters —
+  see the caveats).
+- **What's included:** real delivered **oratory only** — the State-of-the-Union series
+  (Annual Message + State of the Union) and inaugural addresses. Proclamations, veto
+  messages, and other legal/administrative documents are excluded; scored as prose they
+  produce absurd grades (one 1795 proclamation is a single 382-word sentence).
+- **Why it starts at 1913:** before 1913, the annual message to Congress was a **written
+  document read aloud by a clerk**, not delivered oratory — and reading formulas are unstable
+  on those long, dense historical texts. 1913 (when in-person delivery resumed) is the start
+  of the comparable, spoken era. The downloadable dataset keeps the earlier written era too,
+  flagged with a `delivery_mode` column.
+
+**Honest limits:**
+- Reading formulas measure only **surface features** (sentence length, syllables) — not
+  vocabulary sophistication, ideas, or rhetoric. "Simpler to read" ≠ "less substantive."
+- **Absolute grade levels are formula- and source-dependent.** Independent analyses that use
+  a different transcript archive typically land **2–5 grades lower**, especially before 1980.
+  Treat the numbers as a consistent *index*; the **long-term decline replicates** across
+  formulas and across independent studies.
+
+## The data
+
+- **[Download the dataset (CSV)](export/presidential_readability_v1.csv)** — one row per
+  speech, with each readability score, plus a **[codebook](export/presidential_readability_v1_codebook.md)**
+  describing every column.
+- Includes both eras (spoken 1913+ and the earlier written era) with a `delivery_mode` flag,
+  so you can filter as the charts do.
+
+## Reproduce it
+
+The pipeline is a single standalone command (raw source → published export):
+
+```bash
+pip install -r requirements.txt
+python scripts/reproduce.py        # Miller Center corpus -> clean -> readability -> export
+python scripts/validate_charts.py  # re-checks the chart facts; exits 0 if all good
+```
+
+`scripts/reproduce.py` runs the same `src/` logic the analysis uses, in order
+(ingest → clean → prepare), and writes a byte-identical export.
+
+## Sources & license
+
+Full attribution, methodology, and series-break notes: **[SOURCES.md](SOURCES.md)**.
+Source corpus is public domain (U.S. government works); this project's code and derived
+dataset are shared for public use.
+
+---
 
 > **AI-Assisted Development**
-> This project was built with the assistance of [Kiro](https://kiro.dev),
-> an AI-powered development environment. All data sourcing decisions,
-> methodology choices, and published findings are the responsibility of the
-> author. AI was used for code generation, data pipeline construction, and
-> research assistance — not for analysis conclusions or editorial judgment.
-
----
-
-## Data Sources
-
-All data sources are documented in [SOURCES.md](SOURCES.md) with full
-attribution, URLs, licenses, and retrieval notes.
-
-Source provenance is also recorded inside the project database:
-
-```sql
--- Open data/project.duckdb and run:
-SELECT * FROM _sources;
-```
-
----
-
-## Project Structure
-
-```
-presidential-readability/
-├── config.yaml              ← sources, paths, export settings — edit this first
-├── SOURCES.md               ← full data source attribution
-├── requirements.txt
-├── data/
-│   ├── raw/                 ← original downloaded files, never modified
-│   ├── interim/             ← cleaned Parquet files (1:1 match DuckDB table names)
-│   ├── processed/           ← analysis-ready Parquet files
-│   └── project.duckdb       ← single-file database for the project
-├── export/                  ← packaged datasets (CSV, Excel, Parquet + codebook)
-├── outputs/                 ← exploratory chart PNGs (from 04-viz)
-│   └── social/             ← publication-ready charts for posting (from 04b-viz-social)
-├── scripts/
-│   ├── README.md            ← pipeline run order and conventions
-│   ├── ingest_all.py        ← reproducible ingestion
-│   ├── clean_all.py         ← standardize raw tables
-│   └── prepare_export.py    ← build final export
-├── notebooks/
-│   ├── 00-explore.ipynb     ← DuckDB query sandbox
-│   ├── 01-ingest.ipynb      ← fetch sources → data/raw/ → DuckDB
-│   ├── 02-clean.ipynb       ← clean + quality checks → data/interim/
-│   ├── 03-prepare.ipynb     ← feature engineering + export packaging
-│   ├── 04-viz.ipynb         ← exploratory charts → outputs/
-│   ├── 04b-viz-social.ipynb ← publication social charts → outputs/social/
-│   └── 05-analysis.ipynb    ← statistical analysis + findings
-└── src/
-    ├── ingest.py            ← fetch helpers (caching, rate limiting)
-    ├── clean_quality.py     ← DuckDB cleaning + quality reports + _sources
-    ├── prepare.py           ← PII stripping, codebook, packaging
-    ├── viz.py               ← matplotlib chart builders (exploratory)
-    └── viz_social.py        ← Altair + vl-convert social export
-```
-
----
-
-## Workflow
-
-### 1. Configure `config.yaml`
-
-Add each data source under the `sources:` block before ingesting:
-
-```yaml
-sources:
-  my_source:
-    url: https://example.gov/data/table
-    type: html_table      # html_table | html_scrape | csv | json
-    table_index: 0
-    js_render: false
-```
-
-### 2. Document sources in `SOURCES.md`
-
-Before ingesting any data, add an entry to `SOURCES.md` for each source:
-- Full URL
-- Publisher / agency
-- License
-- Fields used
-- Any caveats
-
-### 3. Ingest (`01-ingest.ipynb`)
-
-```python
-from src.ingest import load_config, ingest_source
-cfg = load_config("config.yaml")
-df = ingest_source("my_source", cfg)
-```
-
-Raw files land in `data/raw/` untouched. All tables load into DuckDB at
-`data/project.duckdb` with source metadata written to `_sources`.
-
-### 4. Clean (`02-clean.ipynb`)
-
-```python
-from src.clean_quality import get_connection, clean_table, quality_report, save_interim
-con = get_connection(cfg)
-df_clean = clean_table(df, "my_source_raw", con, cast_map={"year": "INTEGER"})
-quality_report(df_clean, "my_source_clean", con)
-save_interim(df_clean, cfg, "my_source_clean.parquet")
-```
-
-### 5. Prepare & export (`03-prepare.ipynb`)
-
-```python
-from src.prepare import package_dataset
-package_dataset(df, cfg, name="my_dataset_v1",
-                codebook={"col": "description"},
-                notes="Source: Agency. License: Public domain.")
-```
-
-### 6. Visualize (`04-viz.ipynb` + `04b-viz-social.ipynb`)
-
-**04-viz** is for exploratory charting (matplotlib). Output goes to `outputs/`.
-
-```python
-from src.viz import ranked_bar_chart, save_chart
-fig = ranked_bar_chart(df, x="state", y="rate", title="Top 10 States", top_n=10,
-                       preset="instagram_portrait")
-save_chart(fig, cfg, "top10_states", preset="instagram_portrait",
-           add_watermark="@unwelcomedata")
-```
-
-**04b-viz-social** is for publication-ready charts (Altair + vl-convert).
-Output goes to `outputs/social/`. Only curated, validated charts go here.
-
-```python
-from src.viz_social import save_social
-save_social(chart, cfg, 'my_social_chart', preset='twitter_landscape')
-```
-
-### 7. Analyze (`05-analysis.ipynb`)
-
-Statistical analysis, regression, group comparisons. Always read from the
-**export** parquet (not raw DuckDB tables) to ensure consistency with
-published data.
-
----
-
-## Publishing (when the project is ready to go public)
-
-Full procedure is in `.kiro/steering/public-release.md`. The essentials:
-
-1. **Validate first (required gate).** Ship a `scripts/validate_charts.py` that
-   re-checks the chart data against DuckDB (export drift, headline facts,
-   invariants) and run it — it must exit 0 before anything goes public. See
-   `scripts/README.md`.
-2. **Curate a `release` branch** for the public tree (fun tier drops
-   notebooks/src/scripts/config; serious tier keeps src + a reproducible
-   entrypoint). Force-add the CSV + codebook exports and the `docs/` charts.
-3. **`_config.yml`** (root, on both `main` and `release`): set `title:` to the
-   **project name** so the Cayman banner names the project — NOT the generic
-   `@unwelcomedata` (that leaves the page looking untitled). Put the brand in
-   `description:`. Theme is always `jekyll-theme-cayman` (shared identity).
-4. **README brand line** links `@unwelcomedata` to the **GitHub profile**
-   (`https://github.com/unwelcomedata`), never a self-link to the project's own
-   Pages URL.
-5. After publishing, **`git checkout main`** — leaving the repo on `release`
-   strips the notebooks from the working copy and looks like they vanished
-   (they're safe on `main`).
-
-## Anonymity
-
-Commits are authored as `unwelcomedata` to keep the author's real identity
-off the public commit history. Data files, exports, outputs, and `.env`
-secrets are excluded from version control via `.gitignore`.
+> This project was built with the assistance of [Kiro](https://kiro.dev), an AI-powered
+> development environment. All data sourcing decisions, methodology choices, and published
+> findings are the responsibility of the author. AI was used for code generation, data
+> pipeline construction, and research assistance — not for analysis conclusions or editorial
+> judgment.

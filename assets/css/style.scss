@@ -1,0 +1,10 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+@media screen and (min-width: 64em) {
+  .main-content { max-width: 80rem; padding: 2rem 4rem; }
+}
+.main-content img { max-width: 100%; height: auto; }
+.main-content a > img { display: block; margin: 0 auto; }
