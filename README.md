@@ -13,6 +13,10 @@ need to read it comfortably.
 
 ---
 
+[![Presidential readability — infographic](docs/infographic_presidential_readability.png)](docs/infographic_presidential_readability.png)
+
+---
+
 ## The State of the Union got simpler
 
 [![State-of-the-Union reading grade level, 1913–2026](docs/01_sotu_readability.png)](docs/01_sotu_readability.png)
