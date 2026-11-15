@@ -155,14 +155,14 @@
   <text x="80.0" y="1770.0" fill="#003049" font-size="34" font-weight="bold">Sentences got less than half as long</text>
   <text x="80.0" y="1804.0" fill="#6B7280" font-size="22">Average words per sentence, State of the Union, by decade.</text>
   <text x="80.0" y="1872.0" fill="#003049" font-size="26" font-weight="bold">1910s</text>
-  <!-- 1910s 32.1 words -> 834.6px -->
-  <rect x="200" y="1844" width="834.6" height="40" fill="#005F73"/>
-  <text x="1048.6" y="1874.0" fill="#003049" font-size="26" font-weight="bold">32.1 words</text>
+  <!-- 1910s 32.1 words -> 706.2px -->
+  <rect x="200" y="1844" width="706.2" height="40" fill="#005F73"/>
+  <text x="920.2" y="1874.0" fill="#003049" font-size="26" font-weight="bold">32.1 words</text>
   <text x="80.0" y="1952.0" fill="#003049" font-size="26" font-weight="bold">2020s</text>
-  <!-- 2020s 13.2 words -> 343.2px -->
-  <rect x="200" y="1924" width="343.2" height="40" fill="#BB3E03"/>
-  <text x="557.2" y="1954.0" fill="#003049" font-size="26" font-weight="bold">13.2 words</text>
-  <text x="80.0" y="2010.0" fill="#6B7280" font-size="22">Shorter sentences are a large part of why the grade-level formulas fall.</text>
+  <!-- 2020s 13.2 words -> 290.4px -->
+  <rect x="200" y="1924" width="290.4" height="40" fill="#BB3E03"/>
+  <text x="504.4" y="1954.0" fill="#003049" font-size="26" font-weight="bold">13.2 words</text>
+  <text x="80.0" y="2010.0" fill="#6B7280" font-size="22">Words per sentence is one of the two inputs to the Flesch&#8211;Kincaid formula.</text>
   <line x1="80" y1="2050" x2="1120" y2="2050" stroke="#E9D8A6" stroke-width="3"/>
 
   <!-- SECTION 4 — inaugurals -->
@@ -227,6 +227,7 @@
   <text x="219.3" y="2199.2" fill="#CA6702" font-size="20" font-weight="bold" text-anchor="middle">14.2</text>
   <text x="1085.4" y="2370.4" fill="#CA6702" font-size="20" font-weight="bold" text-anchor="middle">5.7</text>
   <text x="1120.0" y="2289.8" fill="#BB3E03" font-size="20" font-weight="bold" text-anchor="middle">9.7</text>
+    <text x="1120.0" y="2472.0" fill="#6B7280" font-size="18" text-anchor="end">No 1993 or 1997 inaugural in the dataset.</text>
   <text x="150.0" y="2448.0" fill="#6B7280" font-size="18" text-anchor="middle">1913</text><text x="600.4" y="2448.0" fill="#6B7280" font-size="18" text-anchor="middle">1965</text><text x="1120.0" y="2448.0" fill="#6B7280" font-size="18" text-anchor="middle">2025</text>
 
   <!-- FOOTER -->

@@ -153,7 +153,7 @@ def build_tall(d):
         grid2.append(t(x2(g), 1668, str(g), 18, GREY, anchor="middle"))
     # S3 words per sentence: bars, scale px per word
     w10, w20 = d["wps"][1910][0], d["wps"][2020][0]
-    pw = 26.0  # px per word
+    pw = 22.0  # px per word
     # S4 inaugural: x 150..1120 (1913..2025), y baseline grade 4 at 2420, 16 at 2180
     xs4 = Lin(1913, 2025, 150, 1120); ys4 = Lin(4, 16, 2420, 2180)
     lol = inaug_lollipops(d, xs4, ys4, 2420, 7)
@@ -211,7 +211,7 @@ def build_tall(d):
   <!-- 2020s {w20} words -> {w20*pw:.1f}px -->
   <rect x="200" y="1924" width="{f(w20*pw)}" height="40" fill="{SPICE}"/>
   {t(200+w20*pw+14,1954,f"{w20:.1f} words",26,NAVY,"bold")}
-  {t(80,2010,"Shorter sentences are a large part of why the grade-level formulas fall.",22,GREY)}
+  {t(80,2010,"Words per sentence is one of the two inputs to the Flesch&#8211;Kincaid formula.",22,GREY)}
   <line x1="80" y1="2050" x2="1120" y2="2050" stroke="{VANILLA}" stroke-width="3"/>
 
   <!-- SECTION 4 — inaugurals -->
@@ -223,6 +223,7 @@ def build_tall(d):
   {t(xs4(imax[0]),ys4(imax[1])-16,f"{imax[1]:.1f}",20,"#CA6702","bold",anchor="middle")}
   {t(xs4(imin[0]),ys4(imin[1])-16,f"{imin[1]:.1f}",20,"#CA6702","bold",anchor="middle")}
   {t(xs4(ilast[0]),ys4(ilast[1])-16,f"{ilast[1]:.1f}",20,SPICE,"bold",anchor="middle")}
+    {t(1120,2472,"No 1993 or 1997 inaugural in the dataset.",18,GREY,anchor="end")}
   {t(xs4(1913),2448,"1913",18,GREY,anchor="middle")}{t(xs4(1965),2448,"1965",18,GREY,anchor="middle")}{t(xs4(2025),2448,"2025",18,GREY,anchor="middle")}
 
   <!-- FOOTER -->
@@ -246,13 +247,13 @@ def build_social(d):
     ticks1 = "".join(t(xs1(y), 662, str(y), 16, GREY, anchor="middle") for y in (1920, 1960, 2000))
     # right-top formulas: x 1000..1520 grade 8..20, rows from y=285 pitch 24
     x2 = Lin(8, 20, 1010, 1520)
-    rows = formula_rows(d, x2, 292, 23.5, 840, 925, 5.5, 17, 13)
+    rows = formula_rows(d, x2, 322, 22.5, 840, 925, 5.5, 17, 13)
     grid2 = []
     for g in (8, 12, 16, 20):
-        grid2.append(f'<line x1="{f(x2(g))}" y1="272" x2="{f(x2(g))}" y2="560" stroke="#E5E0D0" stroke-width="1.5"/>')
-        grid2.append(t(x2(g), 580, str(g), 15, GREY, anchor="middle"))
+        grid2.append(f'<line x1="{f(x2(g))}" y1="304" x2="{f(x2(g))}" y2="570" stroke="#E5E0D0" stroke-width="1.5"/>')
+        grid2.append(t(x2(g), 590, str(g), 15, GREY, anchor="middle"))
     # right-bottom inaugural: x 860..1520 (1913..2025), baseline grade 4 at 780, 16 at 645
-    xs4 = Lin(1913, 2025, 860, 1520); ys4 = Lin(4, 16, 780, 650)
+    xs4 = Lin(1913, 2025, 860, 1520); ys4 = Lin(4, 16, 780, 664)
     lol = inaug_lollipops(d, xs4, ys4, 780, 5)
     imax = max(d["inaug"], key=lambda p: p[1]); imin = min(d["inaug"], key=lambda p: p[1])
     ifirst, ilast = d["inaug"][0], d["inaug"][-1]
@@ -276,7 +277,7 @@ def build_social(d):
   {t(80,262,"From college level to middle school",30,NAVY,"bold")}
   {t(80,292,"State of the Union, average Flesch&#8211;Kincaid grade per year.",20,GREY)}
   {t(80,372,f"{first[1]:.1f}",64,NAVY,"bold")}
-  {t(200,372,f"in {first[0]}",22,GREY)}
+  {t(218,372,f"in {first[0]}",22,GREY)}
   {t(760,372,f"{last[1]:.1f}",64,SPICE,"bold",anchor="end")}
   {t(640,372,f"in {last[0]}",22,GREY,anchor="end")}
   {chr(10).join("  "+g for g in grid1)}
@@ -292,14 +293,14 @@ def build_social(d):
 
   <!-- RIGHT TOP — four formulas -->
   {t(840,262,"Not one formula&#8217;s quirk",30,NAVY,"bold")}
-  {t(840,282,"",1,GREY)}
-  {legend(1010,262,16,128)}
+    {legend(840,292,16,170)}
   {chr(10).join("  "+g for g in grid2)}
   {rows}
   <line x1="840" y1="608" x2="1520" y2="608" stroke="{VANILLA}" stroke-width="3"/>
 
   <!-- RIGHT BOTTOM — inaugurals -->
-  {t(840,640,"Inaugurals slid too, noisier",24,NAVY,"bold")}
+  {t(840,638,"Inaugurals slid too, noisier",24,NAVY,"bold")}
+  {t(1520,638,"No 1993 or 1997 inaugural in the dataset.",14,GREY,anchor="end")}
   <line x1="860" y1="780" x2="1520" y2="780" stroke="{GREY}" stroke-width="2"/>
   {lol}
   {t(xs4(ifirst[0]),ys4(ifirst[1])-10,f"{ifirst[1]:.1f}",15,NAVY,"bold",anchor="middle")}
@@ -329,7 +330,7 @@ def validate(d, tall, social):
         "tall": dict(svg=tall, xs=Lin(1913, 2026, 150, 1120), ys=Lin(6, 20, 870, 570),
                      x2=Lin(8, 20, 260, 1120), xi=Lin(1913, 2025, 150, 1120), yi=Lin(4, 16, 2420, 2180)),
         "social": dict(svg=social, xs=Lin(1913, 2026, 130, 760), ys=Lin(6, 20, 640, 410),
-                       x2=Lin(8, 20, 1010, 1520), xi=Lin(1913, 2025, 860, 1520), yi=Lin(4, 16, 780, 650)),
+                       x2=Lin(8, 20, 1010, 1520), xi=Lin(1913, 2025, 860, 1520), yi=Lin(4, 16, 780, 664)),
     }
     sotu = dict(d["sotu"])
     for name, s in spec.items():
@@ -366,7 +367,7 @@ def validate(d, tall, social):
     # tall-only bars + big numbers
     w10, w20 = d["wps"][1910][0], d["wps"][2020][0]
     bw = [float(x) for x in re.findall(r'<rect x="200" y="\d+" width="([\d.]+)"', tall)]
-    chk("tall: sentence bars width = words x 26px", len(bw) == 2 and abs(bw[0] / 26 - w10) < 0.05 and abs(bw[1] / 26 - w20) < 0.05, f"{bw[0]/26:.2f}, {bw[1]/26:.2f}")
+    chk("tall: sentence bars width = words x 22px", len(bw) == 2 and abs(bw[0] / 22 - w10) < 0.05 and abs(bw[1] / 22 - w20) < 0.05, f"{bw[0]/22:.2f}, {bw[1]/22:.2f}")
     chk("big numbers: 1913 and 2026 values in both renders",
         all(f"{sotu[y]:.1f}" in svg for svg in (tall, social) for y in (1913, 2026)))
     chk("headline: FK 1913 = 15.81, 2026 = 7.62, drop >= 5 grades", sotu[1913] == 15.81 and sotu[2026] == 7.62)
