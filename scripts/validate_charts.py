@@ -60,8 +60,8 @@ def main() -> int:
     feats = con.execute("SELECT * FROM speeches_readability").df()
 
     # ── Universe / scope (the data-quality decisions) ─────────────────────
-    check("scope: 267 scored oratory speeches (SOTU + inaugural)",
-          len(feats) == 267, f"got {len(feats)}")
+    check("scope: 270 scored oratory speeches (SOTU + inaugural)",
+          len(feats) == 270, f"got {len(feats)}")
     # ONLY oratory was scored — no other speech types leaked in.
     types = set(feats["speech_type"].unique())
     only_oratory = feats[(feats.is_sotu_series) | (feats.speech_type == "Inaugural Address")]
@@ -84,8 +84,8 @@ def main() -> int:
     sotu = con.execute(
         "SELECT year, ROUND(AVG(fk_grade),1) fk FROM speeches_readability "
         "WHERE is_sotu_series AND delivery_mode='spoken' GROUP BY year ORDER BY year").df()
-    check("chart01: SOTU spoken series has 87 yearly points",
-          len(sotu) == 87, f"got {len(sotu)}")
+    check("chart01: SOTU spoken series has 88 yearly points",
+          len(sotu) == 88, f"got {len(sotu)}")
     check("chart01: series starts 1913 @ grade 15.8",
           int(sotu.iloc[0].year) == 1913 and sotu.iloc[0].fk == 15.8,
           f"got {int(sotu.iloc[0].year)} @ {sotu.iloc[0].fk}")
@@ -106,8 +106,8 @@ def main() -> int:
     check("chart02: 1910s decade @ grade 15.5",
           int(dec.iloc[0].decade) == 1910 and dec.iloc[0].fk == 15.5,
           f"got {int(dec.iloc[0].decade)} @ {dec.iloc[0].fk}")
-    check("chart02: 2020s decade @ grade 7.8",
-          int(dec.iloc[-1].decade) == 2020 and dec.iloc[-1].fk == 7.8,
+    check("chart02: 2020s decade @ grade 7.7",
+          int(dec.iloc[-1].decade) == 2020 and dec.iloc[-1].fk == 7.7,
           f"got {int(dec.iloc[-1].decade)} @ {dec.iloc[-1].fk}")
     # decade aggregation must actually aggregate (multiple speeches per decade)
     dec_n = con.execute(
@@ -120,6 +120,13 @@ def main() -> int:
     inaug = con.execute(
         "SELECT year, ROUND(fk_grade,1) fk FROM speeches_readability "
         "WHERE speech_type='Inaugural Address' AND delivery_mode='spoken' ORDER BY year").df()
+    # Regression: title variants once silently dropped (fixed 2026-11-15).
+    check("classifier: Clinton 1993/1997 inaugurals + Biden 2024 SOTU are scored",
+          len(con.execute("SELECT 1 FROM speeches_readability WHERE (year IN (1993,1997) AND "
+                          "president='Bill Clinton' AND speech_type='Inaugural Address') OR "
+                          "(year=2024 AND president='Joe Biden' AND is_sotu_series)").fetchall()) == 3)
+    check("chart03: inaugural spoken set = 29 addresses (1913-2025, all inaugurals in the archive)",
+          len(inaug) == 29, f"got {len(inaug)}")
     check("chart03: inaugural spoken series present (>=25 speeches, from 1913)",
           len(inaug) >= 25 and int(inaug.iloc[0].year) == 1913,
           f"got n={len(inaug)} start={int(inaug.iloc[0].year)}")

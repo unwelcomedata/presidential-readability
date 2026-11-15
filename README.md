@@ -81,7 +81,9 @@ python scripts/validate_charts.py  # re-checks the chart facts; exits 0 if all g
 ```
 
 `scripts/reproduce.py` runs the same `src/` logic the analysis uses, in order
-(ingest → clean → prepare), and writes a byte-identical export.
+(ingest → clean → prepare). Against the same archive snapshot it writes a byte-identical
+export; the Miller Center updates its archive occasionally, so a fresh download can differ
+slightly (see *Corrections* in [SOURCES.md](SOURCES.md)).
 
 ## Sources & license
 

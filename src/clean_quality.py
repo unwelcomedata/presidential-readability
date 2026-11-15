@@ -329,9 +329,13 @@ def classify_speech_type(title: str) -> str:
     ``sotu_series()`` for the broad-coverage SOTU comparison.
     """
     l = _title_label(title).lower()
-    if "inaugural address" in l:
+    # Title variants in the Miller Center archive: Clinton's are "First Inaugural" /
+    # "Second Inaugural" (no "Address"); Biden's 2024 is "State of Union Address"
+    # (no "the"). Matching only the long forms silently dropped all three (fixed
+    # 2026-11-15); a title containing "inaugural" is an inaugural address.
+    if "inaugural" in l:
         return "Inaugural Address"
-    if "state of the union" in l:
+    if "state of the union" in l or "state of union" in l:
         return "State of the Union"
     if "annual message" in l:
         return "Annual Message"

@@ -138,6 +138,21 @@ methodology decision a skeptic will scrutinize — document it fully here and in
 
 ---
 
+## Corrections
+- **2026-11-15 — three speeches were misclassified and dropped; fixed and republished.**
+  The speech-type classifier matched only the long title forms "inaugural address" and
+  "state of the union". Three speeches in the Miller Center archive use shorter titles and
+  were silently left out: Clinton's **"First Inaugural" (1993)** and **"Second Inaugural"
+  (1997)**, and Biden's **"State of Union Address" (2024)**. They are now included. Effect:
+  scored speeches 267 -> 270; spoken-era inaugurals 27 -> 29; State of the Union yearly points
+  87 -> 88; the 2020s decade average moved 7.8 -> 7.7. The long-term decline and all headline
+  figures are unchanged. These were the only three titles affected.
+- **Snapshot note.** The published export is built from the Miller Center archive as
+  retrieved on 2026-09-26. The archive is updated from time to time; a fresh download
+  (checked 2026-11-15) leaves every scored figure unchanged except one pre-1913 written-era
+  row, so re-running `scripts/reproduce.py` against a newer download can differ slightly
+  there.
+---
 ## Source Provenance in DuckDB
 
 Every table in `data/project.duckdb` has a corresponding entry in the
