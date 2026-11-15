@@ -110,6 +110,14 @@ All from `src/clean_quality.py` (deterministic, reproducible):
   constitutional address, so cross-president SOTU readability is comparable.
 - `delivery_mode` = **written** (pre-1913, clerk-read documents) vs **spoken** (1913+,
   delivered oratory). This is the readability series break we segment every trend at.
+
+**Correction (2026-11-15) — title variants.** The classifier originally matched only the
+long forms "inaugural address" and "state of the union", which silently dropped three
+speeches the Miller Center archive does contain: Clinton's **"First Inaugural"** (1993) and
+**"Second Inaugural"** (1997) (no "Address") and Biden's **"State of Union Address"** (2024,
+no "the"). Found when a gap in the inaugural series was questioned. Fixed in
+`classify_speech_type` (any title containing "inaugural"; "state of union" accepted), and the
+whole pipeline (02 → 03 → charts → export) re-run. These are the only three titles affected.
         """
     ),
     code(

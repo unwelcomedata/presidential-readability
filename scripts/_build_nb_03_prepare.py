@@ -244,7 +244,7 @@ codebook = {
     "gunning_fog": "Gunning Fog grade-level readability formula.",
     "coleman_liau": "Coleman-Liau grade-level readability formula.",
     "word_count": "Word (lexicon) count of the transcript, per textstat.",
-    "sentence_count": "Sentence count of the transcript, per textstat (the denominator in words/sentence).",
+    "sentence_count": "Sentence count of the transcript, per NLTK punkt (the denominator in words/sentence).",
 }
 
 written = package_dataset(

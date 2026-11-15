@@ -223,8 +223,7 @@ def build_tall(d):
   {t(xs4(imax[0]),ys4(imax[1])-16,f"{imax[1]:.1f}",20,"#CA6702","bold",anchor="middle")}
   {t(xs4(imin[0]),ys4(imin[1])-16,f"{imin[1]:.1f}",20,"#CA6702","bold",anchor="middle")}
   {t(xs4(ilast[0]),ys4(ilast[1])-16,f"{ilast[1]:.1f}",20,SPICE,"bold",anchor="middle")}
-    {t(1120,2472,"No 1993 or 1997 inaugural in the dataset.",18,GREY,anchor="end")}
-  {t(xs4(1913),2448,"1913",18,GREY,anchor="middle")}{t(xs4(1965),2448,"1965",18,GREY,anchor="middle")}{t(xs4(2025),2448,"2025",18,GREY,anchor="middle")}
+    {t(xs4(1913),2448,"1913",18,GREY,anchor="middle")}{t(xs4(1965),2448,"1965",18,GREY,anchor="middle")}{t(xs4(2025),2448,"2025",18,GREY,anchor="middle")}
 
   <!-- FOOTER -->
   <rect x="0" y="{H-90}" width="{W}" height="90" fill="{NAVY}"/>
@@ -300,7 +299,6 @@ def build_social(d):
 
   <!-- RIGHT BOTTOM — inaugurals -->
   {t(840,638,"Inaugurals slid too, noisier",24,NAVY,"bold")}
-  {t(1520,638,"No 1993 or 1997 inaugural in the dataset.",14,GREY,anchor="end")}
   <line x1="860" y1="780" x2="1520" y2="780" stroke="{GREY}" stroke-width="2"/>
   {lol}
   {t(xs4(ifirst[0]),ys4(ifirst[1])-10,f"{ifirst[1]:.1f}",15,NAVY,"bold",anchor="middle")}

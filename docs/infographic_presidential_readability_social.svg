@@ -32,7 +32,7 @@
   <line x1="302.8" y1="559.2" x2="353.0" y2="527.6" stroke="#6B7280" stroke-width="1.5" stroke-dasharray="5 5"/><!-- gap 1944->1953: no address in dataset -->
   <polyline class="sotu" points="130.0,478.8 135.6,538.6 141.2,468.5 146.7,414.3 152.3,518.4 157.9,481.3 163.5,487.7 169.0,444.2 174.6,490.8 180.2,500.8 185.8,548.7 191.3,504.5 196.9,524.7 202.5,518.4 208.1,541.8 213.6,526.0 219.2,500.0 224.8,495.8 230.4,518.3 235.9,528.0" fill="none" stroke="#005F73" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
   <polyline class="sotu" points="286.1,549.3 297.3,552.4 302.8,559.2" fill="none" stroke="#005F73" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
-  <polyline class="sotu" points="353.0,527.6 358.6,520.7 364.2,510.2 369.7,514.3 375.3,518.1 380.9,542.4 386.5,547.7 392.0,523.5 397.6,509.7 403.2,518.4 408.8,528.3 414.3,534.5 419.9,591.2 425.5,558.4 431.1,561.0 436.6,568.2 442.2,563.6 447.8,552.8 453.4,552.6 458.9,546.9 470.1,532.2 475.7,553.1 481.2,561.0 486.8,529.9 492.4,571.5 498.0,546.4 503.5,545.2 514.7,552.1 520.3,546.0 525.8,578.1 531.4,565.2 537.0,565.1 542.6,570.5 548.1,549.5 559.3,577.2 564.9,573.3 570.4,612.6 581.6,586.8 587.2,580.5 592.7,582.8 598.3,570.7 603.9,570.0 609.5,569.2 615.0,580.7 626.2,573.8 631.8,565.7 637.3,568.4 642.9,542.4 648.5,554.2 654.1,570.2 659.6,567.7 670.8,589.9 676.4,613.2 681.9,609.3 687.5,603.9 693.1,568.5 698.7,610.9 704.2,612.4 715.4,585.1 721.0,570.2 726.5,602.0 737.7,608.5 743.3,619.8 760.0,613.4" fill="none" stroke="#005F73" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+  <polyline class="sotu" points="353.0,527.6 358.6,520.7 364.2,510.2 369.7,514.3 375.3,518.1 380.9,542.4 386.5,547.7 392.0,523.5 397.6,509.7 403.2,518.4 408.8,528.3 414.3,534.5 419.9,591.2 425.5,558.4 431.1,561.0 436.6,568.2 442.2,563.6 447.8,552.8 453.4,552.6 458.9,546.9 470.1,532.2 475.7,553.1 481.2,561.0 486.8,529.9 492.4,571.5 498.0,546.4 503.5,545.2 514.7,552.1 520.3,546.0 525.8,578.1 531.4,565.2 537.0,565.1 542.6,570.5 548.1,549.5 559.3,577.2 564.9,573.3 570.4,612.6 581.6,586.8 587.2,580.5 592.7,582.8 598.3,570.7 603.9,570.0 609.5,569.2 615.0,580.7 626.2,573.8 631.8,565.7 637.3,568.4 642.9,542.4 648.5,554.2 654.1,570.2 659.6,567.7 670.8,589.9 676.4,613.2 681.9,609.3 687.5,603.9 693.1,568.5 698.7,610.9 704.2,612.4 715.4,585.1 721.0,570.2 726.5,602.0 737.7,608.5 743.3,619.8 748.8,616.2 760.0,613.4" fill="none" stroke="#005F73" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
   <circle class="dot" data-year="1913" cx="130.0" cy="478.8" r="5.5" fill="#003049"/><!-- 1913 -> 15.81 -->
   <circle class="dot" data-year="2026" cx="760.0" cy="613.4" r="5.5" fill="#BB3E03"/><!-- 2026 -> 7.62 -->
   <circle class="dot" data-year="1916" cx="146.7" cy="414.3" r="5.5" fill="#EE9B00"/><!-- 1916 -> 19.74 -->
@@ -141,18 +141,17 @@
   <circle class="fdot" data-decade="2010" data-f="smog_index" cx="1150.7" cy="547.0" r="5.5" fill="#EE9B00"/><!-- 2010s smog_index 11.31 -->
   <circle class="fdot" data-decade="2010" data-f="gunning_fog" cx="1159.2" cy="547.0" r="5.5" fill="#BB3E03"/><!-- 2010s gunning_fog 11.51 -->
   <circle class="fdot" data-decade="2010" data-f="coleman_liau" cx="1081.0" cy="547.0" r="5.5" fill="#003049"/><!-- 2010s coleman_liau 9.67 -->
-  <line x1="1000.2" y1="569.5" x2="1123.5" y2="569.5" stroke="#E9D8A6" stroke-width="4.4" stroke-linecap="round"/>
+  <line x1="997.7" y1="569.5" x2="1122.2" y2="569.5" stroke="#E9D8A6" stroke-width="4.4" stroke-linecap="round"/>
   <text x="840.0" y="575.5" fill="#003049" font-size="17" font-weight="bold">2020s</text>
-  <text x="925.0" y="574.0" fill="#9CA3AF" font-size="13">n=4</text>
-  <circle class="fdot" data-decade="2020" data-f="fk_grade" cx="1000.2" cy="569.5" r="5.5" fill="#005F73"/><!-- 2020s fk_grade 7.77 -->
-  <circle class="fdot" data-decade="2020" data-f="smog_index" cx="1123.5" cy="569.5" r="5.5" fill="#EE9B00"/><!-- 2020s smog_index 10.67 -->
-  <circle class="fdot" data-decade="2020" data-f="gunning_fog" cx="1120.5" cy="569.5" r="5.5" fill="#BB3E03"/><!-- 2020s gunning_fog 10.6 -->
-  <circle class="fdot" data-decade="2020" data-f="coleman_liau" cx="1069.5" cy="569.5" r="5.5" fill="#003049"/><!-- 2020s coleman_liau 9.4 -->
+  <text x="925.0" y="574.0" fill="#9CA3AF" font-size="13">n=5</text>
+  <circle class="fdot" data-decade="2020" data-f="fk_grade" cx="997.7" cy="569.5" r="5.5" fill="#005F73"/><!-- 2020s fk_grade 7.71 -->
+  <circle class="fdot" data-decade="2020" data-f="smog_index" cx="1122.2" cy="569.5" r="5.5" fill="#EE9B00"/><!-- 2020s smog_index 10.64 -->
+  <circle class="fdot" data-decade="2020" data-f="gunning_fog" cx="1118.8" cy="569.5" r="5.5" fill="#BB3E03"/><!-- 2020s gunning_fog 10.56 -->
+  <circle class="fdot" data-decade="2020" data-f="coleman_liau" cx="1061.9" cy="569.5" r="5.5" fill="#003049"/><!-- 2020s coleman_liau 9.22 -->
   <line x1="840" y1="608" x2="1520" y2="608" stroke="#E9D8A6" stroke-width="3"/>
 
   <!-- RIGHT BOTTOM — inaugurals -->
   <text x="840.0" y="638.0" fill="#003049" font-size="24" font-weight="bold">Inaugurals slid too, noisier</text>
-  <text x="1520.0" y="638.0" fill="#6B7280" font-size="14" text-anchor="end">No 1993 or 1997 inaugural in the dataset.</text>
   <line x1="860" y1="780" x2="1520" y2="780" stroke="#6B7280" stroke-width="2"/>
   <line x1="860.0" y1="780.0" x2="860.0" y2="694.3" stroke="#E9D8A6" stroke-width="3"/>
   <line x1="883.6" y1="780.0" x2="883.6" y2="697.2" stroke="#E9D8A6" stroke-width="3"/>
@@ -174,6 +173,8 @@
   <line x1="1260.7" y1="780.0" x2="1260.7" y2="724.3" stroke="#E9D8A6" stroke-width="3"/>
   <line x1="1284.3" y1="780.0" x2="1284.3" y2="720.3" stroke="#E9D8A6" stroke-width="3"/>
   <line x1="1307.9" y1="780.0" x2="1307.9" y2="753.8" stroke="#E9D8A6" stroke-width="3"/>
+  <line x1="1331.4" y1="780.0" x2="1331.4" y2="727.6" stroke="#E9D8A6" stroke-width="3"/>
+  <line x1="1355.0" y1="780.0" x2="1355.0" y2="723.0" stroke="#E9D8A6" stroke-width="3"/>
   <line x1="1378.6" y1="780.0" x2="1378.6" y2="732.5" stroke="#E9D8A6" stroke-width="3"/>
   <line x1="1402.1" y1="780.0" x2="1402.1" y2="712.1" stroke="#E9D8A6" stroke-width="3"/>
   <line x1="1425.7" y1="780.0" x2="1425.7" y2="721.1" stroke="#E9D8A6" stroke-width="3"/>
@@ -201,6 +202,8 @@
   <circle class="idot" data-year="1981" cx="1260.7" cy="724.3" r="5" fill="#005F73"/><!-- 1981 -> 9.76 -->
   <circle class="idot" data-year="1985" cx="1284.3" cy="720.3" r="5" fill="#005F73"/><!-- 1985 -> 10.18 -->
   <circle class="idot" data-year="1989" cx="1307.9" cy="753.8" r="5" fill="#005F73"/><!-- 1989 -> 6.71 -->
+  <circle class="idot" data-year="1993" cx="1331.4" cy="727.6" r="5" fill="#005F73"/><!-- 1993 -> 9.42 -->
+  <circle class="idot" data-year="1997" cx="1355.0" cy="723.0" r="5" fill="#005F73"/><!-- 1997 -> 9.9 -->
   <circle class="idot" data-year="2001" cx="1378.6" cy="732.5" r="5" fill="#005F73"/><!-- 2001 -> 8.91 -->
   <circle class="idot" data-year="2005" cx="1402.1" cy="712.1" r="5" fill="#005F73"/><!-- 2005 -> 11.02 -->
   <circle class="idot" data-year="2009" cx="1425.7" cy="721.1" r="5" fill="#005F73"/><!-- 2009 -> 10.09 -->
